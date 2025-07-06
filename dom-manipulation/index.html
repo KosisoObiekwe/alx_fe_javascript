@@ -2,77 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dynamic Quote Generator</title>
+  <title>Quote Generator</title>
 </head>
 <body>
-  <h1>Dynamic Quote Generator</h1>
-
-  <select id="categoryFilter" onchange="filterQuotes()">
-    <option value="all">All Categories</option>
-  </select>
+  <h1>Random Quote Generator</h1>
 
   <div id="quoteDisplay"></div>
 
-  <button id="newQuote" onclick="displayRandomQuote()">Show New Quote</button>
+  <button id="newQuote">Show New Quote</button>
 
-  <div>
-    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
-    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-    <button onclick="addQuote()">Add Quote</button>
-  </div>
+  <h2>Add a New Quote</h2>
+  <input type="text" id="quoteText" placeholder="Enter quote text" />
+  <input type="text" id="quoteCategory" placeholder="Enter category" />
+  <button onclick="addQuote()">Add Quote</button>
 
   <script>
-    let quotes = [
-      { text: "The only limit is your mind.", category: "Motivation" },
-      { text: "Design is intelligence made visible.", category: "Design" },
-      { text: "Eat. Sleep. Code. Repeat.", category: "Coding" },
+    const quotes = [
+      { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "Motivational" },
+      { text: "In the middle of every difficulty lies opportunity.", category: "Inspirational" },
+      { text: "Creativity is intelligence having fun.", category: "Creative" }
     ];
 
     function displayRandomQuote() {
-      const category = localStorage.getItem("selectedCategory") || "all";
-      const filtered = category === "all" ? quotes : quotes.filter(q => q.category === category);
-      if (filtered.length === 0) {
-        document.getElementById("quoteDisplay").innerText = "No quotes found.";
-        return;
-      }
-      const random = filtered[Math.floor(Math.random() * filtered.length)];
-      document.getElementById("quoteDisplay").innerText = `${random.text} [${random.category}]`;
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      const quote = quotes[randomIndex];
+      const quoteDisplay = document.getElementById("quoteDisplay");
+      quoteDisplay.innerHTML = `<p>"${quote.text}"</p><p><em>Category: ${quote.category}</em></p>`;
     }
 
     function addQuote() {
-      const text = document.getElementById("newQuoteText").value.trim();
-      const category = document.getElementById("newQuoteCategory").value.trim();
-      if (!text || !category) return alert("Please fill both fields.");
+      const text = document.getElementById("quoteText").value;
+      const category = document.getElementById("quoteCategory").value;
 
-      quotes.push({ text, category });
-      populateCategories();
-      document.getElementById("newQuoteText").value = "";
-      document.getElementById("newQuoteCategory").value = "";
-      displayRandomQuote();
+      if (text && category) {
+        quotes.push({ text, category });
+        displayRandomQuote();
+
+        // Clear input fields
+        document.getElementById("quoteText").value = '';
+        document.getElementById("quoteCategory").value = '';
+      }
     }
 
-    function populateCategories() {
-      const select = document.getElementById("categoryFilter");
-      const categories = [...new Set(quotes.map(q => q.category))];
-      select.innerHTML = `<option value="all">All Categories</option>`;
-      categories.forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.text = cat;
-        select.appendChild(option);
-      });
-      const selected = localStorage.getItem("selectedCategory");
-      if (selected) select.value = selected;
-    }
+    document.getElementById("newQuote").addEventListener("click", displayRandomQuote);
 
-    function filterQuotes() {
-      const selected = document.getElementById("categoryFilter").value;
-      localStorage.setItem("selectedCategory", selected);
-      displayRandomQuote();
-    }
-
-    populateCategories();
+    // Show one quote by default on load
     displayRandomQuote();
   </script>
 </body>
