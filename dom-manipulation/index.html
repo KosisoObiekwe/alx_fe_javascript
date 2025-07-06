@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Quote Generator</title>
 </head>
 <body>
   <h1>Random Quote Generator</h1>
 
-  <div id="quote-display"></div>
+  <div id="quoteDisplay"></div>
 
-  <button id="new-quote-btn">Show New Quote</button>
+  <button id="newQuote">Show New Quote</button>
 
-  <div id="form-container"></div>
+  <h2>Add a New Quote</h2>
+  <form id="addQuoteForm">
+    <input type="text" id="quoteText" placeholder="Enter quote" required />
+    <input type="text" id="quoteCategory" placeholder="Enter category" required />
+    <button type="submit">Add Quote</button>
+  </form>
 
   <script src="script.js"></script>
 </body>
