@@ -1,53 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quote Generator</title>
 </head>
 <body>
   <h1>Random Quote Generator</h1>
 
-  <div id="quoteDisplay"></div>
+  <div>
+    <p id="quote-text"></p>
+    <p id="quote-category"></p>
+  </div>
 
-  <button id="newQuote">Show New Quote</button>
+  <button id="new-quote-btn">Show New Quote</button>
 
-  <h2>Add a New Quote</h2>
-  <input type="text" id="quoteText" placeholder="Enter quote text" />
-  <input type="text" id="quoteCategory" placeholder="Enter category" />
-  <button onclick="addQuote()">Add Quote</button>
+  <h3>Add a New Quote</h3>
+  <input type="text" id="new-quote-text" placeholder="Quote text" />
+  <input type="text" id="new-quote-category" placeholder="Category" />
+  <button id="add-quote-btn">Add Quote</button>
 
-  <script>
-    const quotes = [
-      { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "Motivational" },
-      { text: "In the middle of every difficulty lies opportunity.", category: "Inspirational" },
-      { text: "Creativity is intelligence having fun.", category: "Creative" }
-    ];
-
-    function displayRandomQuote() {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      const quote = quotes[randomIndex];
-      const quoteDisplay = document.getElementById("quoteDisplay");
-      quoteDisplay.innerHTML = `<p>"${quote.text}"</p><p><em>Category: ${quote.category}</em></p>`;
-    }
-
-    function addQuote() {
-      const text = document.getElementById("quoteText").value;
-      const category = document.getElementById("quoteCategory").value;
-
-      if (text && category) {
-        quotes.push({ text, category });
-        displayRandomQuote();
-
-        // Clear input fields
-        document.getElementById("quoteText").value = '';
-        document.getElementById("quoteCategory").value = '';
-      }
-    }
-
-    document.getElementById("newQuote").addEventListener("click", displayRandomQuote);
-
-    // Show one quote by default on load
-    displayRandomQuote();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
