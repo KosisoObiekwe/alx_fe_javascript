@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Quote Generator</title>
+</head>
+<body>
+  <h1>Dynamic Quote Generator</h1>
+
+  <select id="categoryFilter" onchange="filterQuotes()">
+    <option value="all">All Categories</option>
+  </select>
+
+  <div id="quoteDisplay"></div>
+
+  <button id="newQuote" onclick="displayRandomQuote()">Show New Quote</button>
+
+  <div>
+    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+    <button onclick="addQuote()">Add Quote</button>
+  </div>
+
+  <script>
+    let quotes = [
+      { text: "The only limit is your mind.", category: "Motivation" },
+      { text: "Design is intelligence made visible.", category: "Design" },
+      { text: "Eat. Sleep. Code. Repeat.", category: "Coding" },
+    ];
+
+    function displayRandomQuote() {
+      const category = localStorage.getItem("selectedCategory") || "all";
+      const filtered = category === "all" ? quotes : quotes.filter(q => q.category === category);
+      if (filtered.length === 0) {
+        document.getElementById("quoteDisplay").innerText = "No quotes found.";
+        return;
+      }
+      const random = filtered[Math.floor(Math.random() * filtered.length)];
+      document.getElementById("quoteDisplay").innerText = `${random.text} [${random.category}]`;
+    }
+
+    function addQuote() {
+      const text = document.getElementById("newQuoteText").value.trim();
+      const category = document.getElementById("newQuoteCategory").value.trim();
+      if (!text || !category) return alert("Please fill both fields.");
+
+      quotes.push({ text, category });
+      populateCategories();
+      document.getElementById("newQuoteText").value = "";
+      document.getElementById("newQuoteCategory").value = "";
+      displayRandomQuote();
+    }
+
+    function populateCategories() {
+      const select = document.getElementById("categoryFilter");
+      const categories = [...new Set(quotes.map(q => q.category))];
+      select.innerHTML = `<option value="all">All Categories</option>`;
+      categories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.text = cat;
+        select.appendChild(option);
+      });
+      const selected = localStorage.getItem("selectedCategory");
+      if (selected) select.value = selected;
+    }
+
+    function filterQuotes() {
+      const selected = document.getElementById("categoryFilter").value;
+      localStorage.setItem("selectedCategory", selected);
+      displayRandomQuote();
+    }
+
+    populateCategories();
+    displayRandomQuote();
+  </script>
+</body>
+</html>
