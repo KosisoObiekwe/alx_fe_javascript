@@ -1,26 +1,26 @@
 const quotes = [
-  { text: "Success is not final, failure is not fatal.", category: "Motivation" },
-  { text: "The purpose of our lives is to be happy.", category: "Life" },
-  { text: "Turn your wounds into wisdom.", category: "Growth" },
+  { text: "The best way to get started is to quit talking and begin doing.", category: "Motivation" },
+  { text: "Don't let yesterday take up too much of today.", category: "Inspiration" },
+  { text: "It's not whether you get knocked down, it's whether you get up.", category: "Resilience" }
 ];
 
-function displayRandomQuote() {
-  const quote = quotes[Math.floor(Math.random() * quotes.length)];
-  document.getElementById("quote-text").textContent = quote.text;
-  document.getElementById("quote-category").textContent = quote.category;
+function showRandomQuote() {
+  const randomIndex = Math.floor(Math.random() * quotes.length);
+  const quote = quotes[randomIndex];
+  document.getElementById("quote").innerHTML = `"${quote.text}" - ${quote.category}`;
 }
 
 function addQuote() {
-  const text = document.getElementById("new-quote-text").value;
-  const category = document.getElementById("new-quote-category").value;
+  const textInput = document.getElementById("quoteText").value.trim();
+  const categoryInput = document.getElementById("quoteCategory").value.trim();
 
-  if (text && category) {
-    quotes.push({ text, category });
-    displayRandomQuote();
+  if (textInput && categoryInput) {
+    quotes.push({ text: textInput, category: categoryInput });
+    document.getElementById("quoteText").value = "";
+    document.getElementById("quoteCategory").value = "";
+    showRandomQuote();
   }
 }
 
-document.getElementById("new-quote-btn").addEventListener("click", displayRandomQuote);
-document.getElementById("add-quote-btn").addEventListener("click", addQuote);
-
-displayRandomQuote();
+document.getElementById("newQuoteBtn").addEventListener("click", showRandomQuote);
+document.getElementById("addQuoteBtn").addEventListener("click", addQuote);
