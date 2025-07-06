@@ -8,30 +8,34 @@
 <body>
   <h1>Dynamic Quote Generator</h1>
 
-  <!-- Notification -->
-  <div id="notification" style="color: green;"></div>
+  <!-- Notification Area -->
+  <div id="notification" style="color: green; font-weight: bold; margin-bottom: 10px;"></div>
 
-  <!-- Filter -->
+  <!-- Quote Display -->
+  <div id="quoteDisplay"></div>
+
+  <!-- Show Random Quote Button -->
+  <button id="newQuote">Show New Quote</button>
+
+  <!-- Category Filter -->
   <select id="categoryFilter">
     <option value="all">All Categories</option>
   </select>
 
-  <div id="quoteDisplay"></div>
-
-  <!-- Controls -->
-  <button id="newQuote">Show New Quote</button>
-  <button id="pause">Pause</button>
-  <button id="resume">Resume</button>
-  <button id="exportBtn">Export Quotes</button>
-  <input type="file" id="importFile" accept=".json" />
-
-  <!-- Add Quote -->
+  <!-- Add Quote Form -->
   <div>
     <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
     <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
     <button onclick="addQuote()">Add Quote</button>
   </div>
 
+  <!-- Export & Import -->
+  <div style="margin-top: 10px;">
+    <input type="file" id="importFile" accept=".json" />
+    <button id="exportBtn">Export Quotes</button>
+  </div>
+
+  <!-- JS -->
   <script src="script.js"></script>
 </body>
 </html>
