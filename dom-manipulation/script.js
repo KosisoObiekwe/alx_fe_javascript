@@ -1,14 +1,11 @@
 let quotes = [
-  { text: "Code is like humor. When you have to explain it, it’s bad.", category: "Programming" },
-  { text: "Simplicity is the soul of efficiency.", category: "Design" },
-  { text: "Creativity is intelligence having fun.", category: "Inspiration" }
+  { text: "Local quote one", category: "Local" },
+  { text: "Local quote two", category: "Local" }
 ];
 
-// Load from localStorage if exists
-const storedQuotes = localStorage.getItem("quotes");
-if (storedQuotes) quotes = JSON.parse(storedQuotes);
-
-let intervalId = null;
+// Load local storage
+const savedQuotes = localStorage.getItem("quotes");
+if (savedQuotes) quotes = JSON.parse(savedQuotes);
 
 function saveQuotes() {
   localStorage.setItem("quotes", JSON.stringify(quotes));
@@ -17,7 +14,6 @@ function saveQuotes() {
 function populateCategories() {
   const categoryFilter = document.getElementById("categoryFilter");
   const categories = [...new Set(quotes.map(q => q.category))];
-
   categoryFilter.innerHTML = `<option value="all">All Categories</option>`;
   categories.forEach(cat => {
     const option = document.createElement("option");
@@ -25,7 +21,6 @@ function populateCategories() {
     option.textContent = cat;
     categoryFilter.appendChild(option);
   });
-
   const savedFilter = localStorage.getItem("selectedCategory");
   if (savedFilter) {
     categoryFilter.value = savedFilter;
@@ -34,58 +29,37 @@ function populateCategories() {
 }
 
 function displayQuotes(quoteList) {
-  const quoteDisplay = document.getElementById("quoteDisplay");
-  quoteDisplay.innerHTML = "";
-
-  quoteList.forEach(quote => {
-    const container = document.createElement("div");
-    const p = document.createElement("p");
-    const span = document.createElement("span");
-
-    p.textContent = quote.text;
-    span.textContent = `(${quote.category})`;
-
-    container.appendChild(p);
-    container.appendChild(span);
-    quoteDisplay.appendChild(container);
+  const container = document.getElementById("quoteDisplay");
+  container.innerHTML = "";
+  quoteList.forEach(q => {
+    const div = document.createElement("div");
+    div.innerHTML = `<p>${q.text}</p><span>(${q.category})</span>`;
+    container.appendChild(div);
   });
 }
 
 function showRandomQuote() {
-  const selected = document.getElementById("categoryFilter").value;
-  const list = selected === "all" ? quotes : quotes.filter(q => q.category === selected);
-
+  const category = document.getElementById("categoryFilter").value;
+  const list = category === "all" ? quotes : quotes.filter(q => q.category === category);
   if (list.length === 0) return;
 
-  const randomQuote = list[Math.floor(Math.random() * list.length)];
-  const quoteDisplay = document.getElementById("quoteDisplay");
+  const random = list[Math.floor(Math.random() * list.length)];
+  const container = document.getElementById("quoteDisplay");
+  container.innerHTML = `<div><p>${random.text}</p><span>(${random.category})</span></div>`;
 
-  quoteDisplay.innerHTML = `
-    <div>
-      <p>${randomQuote.text}</p>
-      <span>(${randomQuote.category})</span>
-    </div>
-  `;
-
-  sessionStorage.setItem("lastQuote", JSON.stringify(randomQuote));
+  sessionStorage.setItem("lastQuote", JSON.stringify(random));
 }
 
 function addQuote() {
-  const textInput = document.getElementById("newQuoteText");
-  const categoryInput = document.getElementById("newQuoteCategory");
-
-  const text = textInput.value.trim();
-  const category = categoryInput.value.trim();
-
+  const text = document.getElementById("newQuoteText").value.trim();
+  const category = document.getElementById("newQuoteCategory").value.trim();
   if (text && category) {
     quotes.push({ text, category });
     saveQuotes();
-
     populateCategories();
     showRandomQuote();
-
-    textInput.value = "";
-    categoryInput.value = "";
+    document.getElementById("newQuoteText").value = "";
+    document.getElementById("newQuoteCategory").value = "";
   }
 }
 
@@ -102,16 +76,16 @@ function importFromJsonFile(event) {
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
-      const importedQuotes = JSON.parse(e.target.result);
-      if (Array.isArray(importedQuotes)) {
-        quotes.push(...importedQuotes);
+      const imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        quotes.push(...imported);
         saveQuotes();
         alert("Quotes imported successfully!");
         populateCategories();
         showRandomQuote();
       }
     } catch (err) {
-      alert("Invalid JSON file.");
+      alert("Invalid file format.");
     }
   };
   reader.readAsText(event.target.files[0]);
@@ -120,15 +94,42 @@ function importFromJsonFile(event) {
 function filterQuotes() {
   const selected = document.getElementById("categoryFilter").value;
   localStorage.setItem("selectedCategory", selected);
-
   const list = selected === "all" ? quotes : quotes.filter(q => q.category === selected);
   displayQuotes(list);
 }
 
+function syncWithServer() {
+  const notification = document.getElementById("notification");
+  fetch("https://raw.githubusercontent.com/OpenAI/ChatGPT-Example/main/mock-quotes.json")
+    .then(res => res.json())
+    .then(serverQuotes => {
+      let added = 0;
+      serverQuotes.forEach(sq => {
+        const exists = quotes.some(lq => lq.text === sq.text);
+        if (!exists) {
+          quotes.push(sq);
+          added++;
+        }
+      });
+
+      if (added > 0) {
+        saveQuotes();
+        populateCategories();
+        filterQuotes();
+        notification.textContent = `✔ Synced with server. ${added} new quote(s) added.`;
+        setTimeout(() => notification.textContent = "", 4000);
+      }
+    })
+    .catch(() => {
+      notification.textContent = "⚠ Failed to sync with server.";
+      setTimeout(() => notification.textContent = "", 4000);
+    });
+}
+
+let intervalId = null;
 function startAutoRotation() {
   if (!intervalId) intervalId = setInterval(showRandomQuote, 10000);
 }
-
 function stopAutoRotation() {
   clearInterval(intervalId);
   intervalId = null;
@@ -147,11 +148,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const last = sessionStorage.getItem("lastQuote");
   if (last) {
     const q = JSON.parse(last);
-    const container = document.getElementById("quoteDisplay");
-    container.innerHTML = `<div><p>${q.text}</p><span>(${q.category})</span></div>`;
+    document.getElementById("quoteDisplay").innerHTML = `<div><p>${q.text}</p><span>(${q.category})</span></div>`;
   } else {
     showRandomQuote();
   }
 
   startAutoRotation();
+  syncWithServer();              // initial sync
+  setInterval(syncWithServer, 30000); // auto sync every 30s
 });
